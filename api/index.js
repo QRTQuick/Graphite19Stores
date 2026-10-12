@@ -33,8 +33,11 @@ const routes = new Map([
 ])
 
 export default async function handler(request, response) {
-  const pathname = new URL(request.url || '/', `https://${request.headers?.host || 'localhost'}`).pathname
-  const route = pathname.replace(/^\/api\/?/, '').replace(/\/$/, '')
+  const url = new URL(request.url || '/', `https://${request.headers?.host || 'localhost'}`)
+  const pathname = url.pathname
+  const configuredPath = request.query?.path || url.searchParams.get('path')
+  const rewrittenPath = Array.isArray(configuredPath) ? configuredPath.join('/') : configuredPath
+  const route = String(rewrittenPath || pathname.replace(/^\/api\/?/, '')).replace(/^\//, '').replace(/\/$/, '')
   const endpoint = routes.get(route)
   if (!endpoint) return response.status(404).json({ error: 'API route not found.' })
   return endpoint(request, response, globalThis.process?.env || {})

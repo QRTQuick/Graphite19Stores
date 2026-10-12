@@ -1,6 +1,21 @@
 {
   "rewrites": [
-    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/sitemap.xml", "destination": "/api/index?path=sitemap" },
+    { "source": "/api/address-details", "destination": "/api/index?path=address-details" },
+    { "source": "/api/address-suggestions", "destination": "/api/index?path=address-suggestions" },
+    { "source": "/api/admin/marketplace", "destination": "/api/index?path=admin/marketplace" },
+    { "source": "/api/admin/marketplace-action", "destination": "/api/index?path=admin/marketplace-action" },
+    { "source": "/api/marketplace/create-listing", "destination": "/api/index?path=marketplace/create-listing" },
+    { "source": "/api/marketplace/submit-feedback", "destination": "/api/index?path=marketplace/submit-feedback" },
+    { "source": "/api/payments/create-marketplace", "destination": "/api/index?path=payments/create-marketplace" },
+    { "source": "/api/payments/flutterwave-webhook", "destination": "/api/index?path=payments/flutterwave-webhook" },
+    { "source": "/api/payments/marketplace-status", "destination": "/api/index?path=payments/marketplace-status" },
+    { "source": "/api/payments/my-orders", "destination": "/api/index?path=payments/my-orders" },
+    { "source": "/api/payments/seller-orders", "destination": "/api/index?path=payments/seller-orders" },
+    { "source": "/api/payments/update-fulfillment", "destination": "/api/index?path=payments/update-fulfillment" },
+    { "source": "/api/payments/verify-marketplace", "destination": "/api/index?path=payments/verify-marketplace" },
+    { "source": "/api/products", "destination": "/api/index?path=products" },
+    { "source": "/api/sitemap", "destination": "/api/index?path=sitemap" },
+    { "source": "/:path((?!api/).*)", "destination": "/index.html" }
   ]
 }
