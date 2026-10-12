@@ -1,4 +1,4 @@
-import { Component, lazy, Suspense, useEffect } from 'react'
+import { Component, lazy, Suspense, useEffect, useRef } from 'react'
 import { BrowserRouter, Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
 import './pages.css'
@@ -6,6 +6,7 @@ import StoreLayout from './components/StoreLayout.jsx'
 import { StoreProvider } from './context/StoreContext.jsx'
 import { useStore } from './context/useStore.js'
 import LoadingScreen from './components/LoadingScreen.jsx'
+import { supabase } from './lib/supabase.js'
 
 const HomePage = lazy(() => import('./pages/HomePage.jsx'))
 const ShopPage = lazy(() => import('./pages/ShopPage.jsx'))
@@ -118,6 +119,42 @@ function PageMetadata() {
   return null
 }
 
+function newVisitSessionId() {
+  return globalThis.crypto?.randomUUID?.() || 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (character) => {
+    const random = Math.floor(Math.random() * 16)
+    return (character === 'x' ? random : (random & 0x3) | 0x8).toString(16)
+  })
+}
+
+function SiteVisitTracker() {
+  const { pathname } = useLocation()
+  const lastRecordedPath = useRef('')
+
+  useEffect(() => {
+    if (lastRecordedPath.current === pathname) return
+    lastRecordedPath.current = pathname
+    if (!supabase) return
+
+    try {
+      let sessionId = window.sessionStorage.getItem('g19-analytics-session')
+      if (!sessionId || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(sessionId)) {
+        sessionId = newVisitSessionId()
+        window.sessionStorage.setItem('g19-analytics-session', sessionId)
+      }
+      void supabase.from('site_page_views').insert({
+        session_id: sessionId,
+        page_path: pathname.slice(0, 300),
+      }).then(({ error }) => {
+        if (error) throw error
+      }).catch(() => {})
+    } catch {
+      // Analytics must never interrupt the storefront if browser storage is unavailable.
+    }
+  }, [pathname])
+
+  return null
+}
+
 function SiteRoutes() {
   const location = useLocation()
   return <><PageMetadata/><PageErrorBoundary key={location.pathname}><Suspense fallback={<LoadingScreen/>}><div className="page-transition" key={location.pathname}><Routes><Route element={<StoreLayout/>}>
@@ -139,5 +176,5 @@ function SiteRoutes() {
 }
 
 export default function App() {
-  return <BrowserRouter><StoreProvider><SiteRoutes/><Analytics /></StoreProvider></BrowserRouter>
+  return <BrowserRouter><StoreProvider><SiteVisitTracker/><SiteRoutes/><Analytics/></StoreProvider></BrowserRouter>
 }

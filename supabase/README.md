@@ -12,6 +12,21 @@ Apply `migrations/20261012091621_create_profiles.sql` only if you choose to move
 
 This repository is not linked to a Supabase project yet, and the browser publishable key cannot apply database migrations. The SQL file is ready, but it has not been applied to the hosted project.
 
+## Site analytics
+
+Enable **Analytics** for the project in the Vercel dashboard to see Vercel's visitor and page-view reports. The app also records route views in `public.site_page_views` after you apply `migrations/20261012150542_create_site_visit_analytics.sql` to Supabase. It stores the page path, timestamp, and a random per-tab session ID; it does not store names, emails, or IP addresses. The public app can insert records but cannot read or edit them through the Data API.
+
+To review counts in Supabase SQL Editor:
+
+```sql
+select
+  count(*) as page_views,
+  count(distinct session_id) as visitor_sessions
+from public.site_page_views;
+```
+
+`visitor_sessions` is an estimate of browser-tab sessions, not a count of distinct people. Vercel Analytics provides the visitor reports in its dashboard.
+
 ## Enable Google sign-in
 
 In **Authentication → Sign-in providers**, enable Google and enter the Google OAuth web client ID and client secret. Add `http://localhost:5173/account` and your production account URL to Supabase's redirect URL allow list. In Google Cloud, add your site origin as an authorized JavaScript origin and the Supabase Auth callback shown in the Google provider settings as an authorized redirect URI.

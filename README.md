@@ -20,6 +20,8 @@ Configure `GOOGLE_MAPS_API_KEY` as a server-side environment variable in local `
 
 The live sitemap is served at `/sitemap.xml`; it lists public pages and visible products from the connected Printify catalog. `public/robots.txt` references the sitemap. After deploying, submit `https://graphite19-stores.vercel.app/sitemap.xml` in Google Search Console to help Google discover the store URLs.
 
+Vercel Web Analytics is included for traffic reporting. Enable it from the project's **Analytics** section in the Vercel dashboard. For database page-view records and visitor-session counts, apply the analytics migration and use the SQL query in [supabase/README.md](supabase/README.md).
+
 The Vite development server exposes the same Printify catalog through `/api/products`; production uses the Vercel-style `api/products.js` handler. Keep the Printify API key and shop ID on the server and configure them in the production host environment.
 
 Supabase Auth stores registered accounts in its managed `auth.users` table. The account page saves display name and phone in the signed-in user's Auth metadata, so profile editing does not depend on a separate table migration. See [supabase/README.md](supabase/README.md) for Google provider and optional database setup.
