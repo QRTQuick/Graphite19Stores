@@ -4,7 +4,7 @@ Supabase Auth stores registrations in its managed `auth.users` table. This proje
 
 ## Profile details
 
-The account page stores the customer's display name and phone number in their Supabase Auth user metadata. This keeps profile editing available without a separate table migration. These values are for display/contact purposes only and are not used for authorization.
+The account page stores the customer's display name, phone number, country, country code, and state/province/region in their Supabase Auth user metadata. Customers enter and save these details after signing in; location is not inferred from their device or IP address. This keeps profile editing available without a separate table migration. These values are for display/contact purposes only and are not used for authorization.
 
 ## Optional profile table
 
