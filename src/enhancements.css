@@ -130,3 +130,4 @@ button:disabled{cursor:not-allowed}
 @keyframes image-loading-spin{to{transform:rotate(360deg)}}
 @media(max-width:760px){.detail-image .product-image-frame{min-height:0;height:100%;aspect-ratio:.9}.detail-image .product-image-frame>img{max-height:none}}
 @media(prefers-reduced-motion:reduce){.image-loading-mark i{animation:none}}
+.detail-price-note{margin:-15px 0 20px;color:#77787a;font-size:9px}

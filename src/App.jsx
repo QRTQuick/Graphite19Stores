@@ -18,12 +18,18 @@ const ContactPage = lazy(() => import('./pages/ContentPages.jsx').then((module) 
 const LegalPage = lazy(() => import('./pages/ContentPages.jsx').then((module) => ({ default: module.LegalPage })))
 const FAQPage = lazy(() => import('./pages/ContentPages.jsx').then((module) => ({ default: module.FAQPage })))
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage.jsx'))
+const MarketplacePage = lazy(() => import('./pages/MarketplacePages.jsx').then((module) => ({ default: module.MarketplacePage })))
+const MarketplaceListingPage = lazy(() => import('./pages/MarketplacePages.jsx').then((module) => ({ default: module.MarketplaceListingPage })))
+const SellerPage = lazy(() => import('./pages/MarketplacePages.jsx').then((module) => ({ default: module.SellerPage })))
+const MarketplaceCheckoutPage = lazy(() => import('./pages/MarketplaceCheckoutPages.jsx').then((module) => ({ default: module.MarketplaceCheckoutPage })))
+const PaymentResultPage = lazy(() => import('./pages/MarketplaceCheckoutPages.jsx').then((module) => ({ default: module.PaymentResultPage })))
+const BuyerOrdersPage = lazy(() => import('./pages/MarketplaceCheckoutPages.jsx').then((module) => ({ default: module.BuyerOrdersPage })))
 
 function ProtectedRoute({ children, checkout = false }) {
   const { user, authLoading } = useStore()
   const location = useLocation()
   if (authLoading) return <LoadingScreen label="Loading your account"/>
-  return user ? children : <Navigate to="/login" replace state={{ from: location.pathname, checkoutRequired: checkout }}/>
+  return user ? children : <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}`, checkoutRequired: checkout }}/>
 }
 
 function NotFound() {
@@ -51,6 +57,9 @@ function PageMetadata() {
     const titles = {
       '/': 'Custom Clothes & Face Caps | Graphite19Stores',
       '/shop': 'Shop Custom Clothes & Face Caps | Graphite19Stores',
+      '/marketplace': 'Shop Independent Sellers | Graphite19Stores Marketplace',
+      '/sell': 'Sell on Graphite19Stores | Open a Seller Store',
+      '/seller-terms': 'Seller Terms | Graphite19Stores Marketplace',
       '/about': 'About Graphite19Stores | Custom Clothing Designed in Lagos',
       '/contact': 'Contact Graphite19Stores | Customer Support',
       '/faq': 'FAQs — Graphite19Stores',
@@ -58,6 +67,7 @@ function PageMetadata() {
       '/signup': 'Create an Account — Graphite19Stores',
       '/reset-password': 'Reset Your Password — Graphite19Stores',
       '/account': 'Your Account — Graphite19Stores',
+      '/orders': 'Your Marketplace Orders | Graphite19Stores',
       '/checkout': 'Your Bag — Graphite19Stores',
       '/privacy': 'Privacy — Graphite19Stores',
       '/terms': 'Terms — Graphite19Stores',
@@ -65,6 +75,8 @@ function PageMetadata() {
     const descriptions = {
       '/': 'Shop custom clothes, everyday streetwear and face caps at comfortable prices. Discover fresh designs from Graphite19Stores, designed in Lagos.',
       '/shop': 'Explore custom clothing, graphic apparel and face caps from Graphite19Stores. Find everyday styles at comfortable prices.',
+      '/marketplace': 'Discover clothes, cars, computers, watches and other finds from independent Graphite19Stores marketplace sellers.',
+      '/sell': 'Apply to sell clothes, cars, computers, watches and other products on the Graphite19Stores marketplace.',
       '/about': 'Meet Graphite19Stores, a Lagos-based brand creating custom clothes and face caps for everyday style.',
       '/contact': 'Get in touch with Graphite19Stores for help with custom clothing, face caps, products and orders.',
       '/faq': 'Find answers about Graphite19Stores custom clothes, face caps, shipping, orders and payment.',
@@ -75,7 +87,7 @@ function PageMetadata() {
     const title = product ? `${product.title} | Graphite19Stores` : titles[pathname] || 'Page not found | Graphite19Stores'
     const description = productDescription || descriptions[pathname] || 'Shop custom clothes and face caps at comfortable prices from Graphite19Stores.'
     const canonicalUrl = `https://graphite19-stores.vercel.app${pathname}`
-    const privatePath = ['/login', '/signup', '/reset-password', '/account', '/checkout'].includes(pathname)
+    const privatePath = ['/login', '/signup', '/reset-password', '/account', '/checkout', '/orders', '/payment/return'].includes(pathname) || pathname.startsWith('/marketplace/checkout/')
     const robots = (!product && !titles[pathname]) || privatePath ? 'noindex, nofollow' : 'index, follow, max-image-preview:large'
     document.title = title
     document.querySelector('meta[name="description"]')?.setAttribute('content', description)
@@ -160,6 +172,13 @@ function SiteRoutes() {
   return <><PageMetadata/><PageErrorBoundary key={location.pathname}><Suspense fallback={<LoadingScreen/>}><div className="page-transition" key={location.pathname}><Routes><Route element={<StoreLayout/>}>
     <Route index element={<HomePage/>}/>
     <Route path="shop" element={<ShopPage/>}/>
+    <Route path="marketplace" element={<MarketplacePage/>}/>
+    <Route path="marketplace/listing/:id" element={<MarketplaceListingPage/>}/>
+    <Route path="marketplace/checkout/:id" element={<ProtectedRoute checkout><MarketplaceCheckoutPage/></ProtectedRoute>}/>
+    <Route path="payment/return" element={<ProtectedRoute><PaymentResultPage/></ProtectedRoute>}/>
+    <Route path="orders" element={<ProtectedRoute><BuyerOrdersPage/></ProtectedRoute>}/>
+    <Route path="sell" element={<SellerPage/>}/>
+    <Route path="seller-terms" element={<LegalPage type="seller"/>}/>
     <Route path="products/:id" element={<ProductPage/>}/>
     <Route path="about" element={<AboutPage/>}/>
     <Route path="contact" element={<ContactPage/>}/>

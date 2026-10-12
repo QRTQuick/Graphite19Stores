@@ -5,6 +5,13 @@ import { getPrintifyProducts, PrintifyError } from './api/_lib/printify.js'
 import { createSitemap } from './api/_lib/sitemap.js'
 import addressSuggestions from './api/address-suggestions.js'
 import addressDetails from './api/address-details.js'
+import createMarketplacePayment from './api/payments/create-marketplace.js'
+import verifyMarketplacePayment from './api/payments/verify-marketplace.js'
+import flutterwaveWebhook from './api/payments/flutterwave-webhook.js'
+import marketplacePaymentStatus from './api/payments/marketplace-status.js'
+import myMarketplaceOrders from './api/payments/my-orders.js'
+import sellerMarketplaceOrders from './api/payments/seller-orders.js'
+import updateMarketplaceFulfillment from './api/payments/update-fulfillment.js'
 
 function printifyDevApi(env) {
   return {
@@ -48,9 +55,18 @@ function printifyDevApi(env) {
         ['/address-suggestions', addressSuggestions],
         ['/address-details', addressDetails],
       ])
+      const paymentHandlers = new Map([
+        ['/payments/create-marketplace', createMarketplacePayment],
+        ['/payments/verify-marketplace', verifyMarketplacePayment],
+        ['/payments/flutterwave-webhook', flutterwaveWebhook],
+        ['/payments/marketplace-status', marketplacePaymentStatus],
+        ['/payments/my-orders', myMarketplaceOrders],
+        ['/payments/seller-orders', sellerMarketplaceOrders],
+        ['/payments/update-fulfillment', updateMarketplaceFulfillment],
+      ])
       server.middlewares.use('/api', async (request, response, next) => {
         const pathname = request.url?.split('?')[0] || ''
-        const handler = addressHandlers.get(pathname)
+        const handler = addressHandlers.get(pathname) || paymentHandlers.get(pathname)
         if (!handler) return next()
 
         const chunks = []
@@ -73,9 +89,9 @@ function printifyDevApi(env) {
         }
         try {
           await handler(request, apiResponse, env)
-          if (!ended) apiResponse.status(500).json({ error: 'Address services are temporarily unavailable.' })
+          if (!ended) apiResponse.status(500).json({ error: 'The requested service is temporarily unavailable.' })
         } catch {
-          if (!ended) apiResponse.status(500).json({ error: 'Address services are temporarily unavailable.' })
+          if (!ended) apiResponse.status(500).json({ error: 'The requested service is temporarily unavailable.' })
         }
       })
     },

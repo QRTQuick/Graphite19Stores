@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
 
 const questions = [
-  ['How are Graphite19Stores products made?', 'Our collection is made to order through our fulfilment partner. Product availability and options are shown on each product page.'],
-  ['When will my order arrive?', 'Delivery estimates depend on your location and the item. We’ll show shipping details before payment is connected.'],
+  ['What can I find on Graphite19Stores?', 'Shop the Graphite19 clothing label or browse independent marketplace sellers offering clothes, cars, PCs, watches and more.'],
+  ['Who sells marketplace listings?', 'Independent sellers apply for a store and listings are reviewed before they appear publicly. Ask a seller questions from the listing page before making arrangements.'],
+  ['When will marketplace checkout and delivery be available?', 'Marketplace checkout, delivery coordination and seller payouts are still being configured. Do not send payment for marketplace listings through this site until checkout is announced as available.'],
+  ['How are Graphite19 label products made?', 'The Graphite19 label collection is made to order through our fulfilment partner. Product availability and options are shown on each product page.'],
   ['Can I change or cancel an order?', 'Because items are made to order, contact us as soon as possible and include your order details so we can check what is possible.'],
-  ['How will I pay?', 'Checkout is being prepared for Flutterwave. You’ll see the available payment methods once secure payment processing is enabled.'],
+  ['How will I pay?', 'Checkout will be enabled after Flutterwave payment verification and seller settlement are configured. You will see payment options only after secure processing is available.'],
 ]
 
 export default function FaqSection({ compact = false }) {

@@ -2,13 +2,16 @@
 
 A responsive React storefront built with Vite. The catalog reads from a server-side Printify endpoint, with curated fallback products if Printify is unavailable. Supabase Auth supports email/password registration and sign-in, Google OAuth, password reset, and customer profiles.
 
+The site also includes an early multi-vendor marketplace for independent seller applications, reviewed listings (clothes, cars, PCs, watches and other categories), buyer-seller messages, and listing reports. Marketplace database setup and moderation are documented in [supabase/README.md](supabase/README.md). The Graphite19 label remains a separate catalog.
+
 ## Local setup
 
 1. Copy `.env.example` to `.env` (already ignored by Git).
 2. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` from your Supabase project. In Supabase Authentication, enable Google and add your local and production account URLs to the redirect URL allow list.
 3. Set `PRINTIFY_API_KEY` and `PRINTIFY_SHOP_ID` in the server environment. Keep these server-only values out of any `VITE_` variable and out of source control.
 4. For delivery address suggestions, enable Google Maps Platform's Places API (New) and set the server-only `GOOGLE_MAPS_API_KEY`.
-5. Run `npm run dev`.
+5. Apply the marketplace migration described in [supabase/README.md](supabase/README.md) before using seller or marketplace pages.
+6. Run `npm run dev`.
 
 ## Production hosting
 
@@ -16,7 +19,7 @@ Build with `npm run build` and publish the generated `dist/` directory from the 
 
 Configure `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` as build-time environment variables on the hosting provider. Configure `PRINTIFY_API_KEY` and `PRINTIFY_SHOP_ID` as server-side environment variables. The Printify API route requires a host that supports the included Vercel function (`api/products.js`).
 
-Configure `GOOGLE_MAPS_API_KEY` as a server-side environment variable in local `.env` and Vercel. Never prefix it with `VITE_`. Google Places address suggestions remain available; address verification and online checkout are currently paused until a verification provider and payment provider are configured. Check the countries Printify can fulfill before enabling payment for a destination.
+Configure `GOOGLE_MAPS_API_KEY`, `FLW_SECRET_KEY`, `FLW_SECRET_HASH`, `SUPABASE_SECRET_KEY` and `APP_BASE_URL` as server-only environment variables in local `.env` and Vercel. Never prefix secrets with `VITE_`. Set `MARKETPLACE_PAYMENTS_ENABLED=true` only after Flutterwave sandbox verification and written seller settlement terms are in place; it defaults to `false`. Marketplace checkout is NGN-only, is collected into the platform Flutterwave account, and has no automatic seller split. Checkout is enabled seller by seller after approval and settlement terms are agreed. Delivery fees are agreed separately with the seller and are not collected through marketplace checkout.
 
 The live sitemap is served at `/sitemap.xml`; it lists public pages and visible products from the connected Printify catalog. `public/robots.txt` references the sitemap. After deploying, submit `https://graphite19-stores.vercel.app/sitemap.xml` in Google Search Console to help Google discover the store URLs.
 
@@ -26,4 +29,4 @@ The Vite development server exposes the same Printify catalog through `/api/prod
 
 Supabase Auth stores registered accounts in its managed `auth.users` table. The account page saves display name and phone in the signed-in user's Auth metadata, so profile editing does not depend on a separate table migration. See [supabase/README.md](supabase/README.md) for Google provider and optional database setup.
 
-The “Continue to checkout” action is a presentation placeholder; connect a checkout provider before accepting orders. Product purchase options, shipping rates, and tax calculations should come from your Printify and checkout configuration.
+The Graphite19 “Continue to checkout” action is a presentation placeholder. Marketplace Flutterwave checkout is implemented but stays disabled by default and is shown only for approved sellers whose `checkout_enabled` flag has been enabled by an administrator. Seller payouts are manual under a separate agreement; no automatic split or seller bank transfer is implemented. Test the Flutterwave flow in sandbox and document seller payout, delivery, refund and tax handling before enabling production payments.

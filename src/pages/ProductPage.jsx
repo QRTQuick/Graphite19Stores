@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { ProductImage } from '../components/StoreLayout.jsx'
 import LoadingScreen from '../components/LoadingScreen.jsx'
 import { useStore } from '../context/useStore.js'
+import { getLowestPriceVariant } from '../lib/pricing.js'
 
 function optionValue(variant, name) {
   return variant?.optionValues?.[name] || null
@@ -14,7 +15,7 @@ export default function ProductPage() {
   const product = products.find((item) => String(item.id) === id)
   const variants = product?.variants || []
   const [selectedId, setSelectedId] = useState(null)
-  const selected = variants.find((variant) => String(variant.id) === String(selectedId)) || variants[0]
+  const selected = variants.find((variant) => String(variant.id) === String(selectedId)) || getLowestPriceVariant(product) || variants[0]
   const [added, setAdded] = useState(false)
   const colorOptionName = product?.colorOptionName
   const sizeOptionName = product?.sizeOptionName
@@ -55,6 +56,7 @@ export default function ProductPage() {
         <p className="eyebrow">{product.category || 'GRAPHITE19STORES'}</p>
         <h1>{product.title}</h1>
         <p className="detail-price">${Number(selected?.price ?? product.price).toFixed(2)}</p>
+        {variants.length > 1 && <p className="detail-price-note">Price shown for the selected option.</p>}
         <p className="detail-description">{description}</p>
         {colorOption && <section className="variant-picker" aria-label="Choose a color">
           <div className="variant-label"><span>Color</span><span>{selectedColor?.title || 'Select a color'}</span></div>

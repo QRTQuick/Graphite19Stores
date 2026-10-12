@@ -9,7 +9,9 @@ export default function AuthPage({ mode = 'login' }) {
   const { user } = useStore()
   const navigate = useNavigate()
   const location = useLocation()
-  const returnTo = location.state?.from === '/checkout' ? '/checkout' : '/account'
+  const returnTo = location.state?.from === '/checkout' || location.state?.from === '/orders' || location.state?.from === '/sell' || location.state?.from?.startsWith('/marketplace/checkout/') || location.state?.from?.startsWith('/marketplace/listing/') || location.state?.from?.startsWith('/payment/return')
+    ? location.state.from
+    : '/account'
   const checkoutRequired = location.state?.checkoutRequired === true
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')

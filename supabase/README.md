@@ -12,6 +12,41 @@ Apply `migrations/20261012091621_create_profiles.sql` only if you choose to move
 
 This repository is not linked to a Supabase project yet, and the browser publishable key cannot apply database migrations. The SQL file is ready, but it has not been applied to the hosted project.
 
+## Marketplace database
+
+Before using the marketplace, apply `migrations/20261012170000_create_marketplace.sql` in the Supabase Dashboard SQL Editor. This repository does not have the Supabase CLI or a linked project configured in this workspace, so the migration has not been applied to the hosted database. The migration creates seller stores, listings, private buyer/seller messages, listing reports, and server-only order and payout tables. It enables RLS and explicit grants; public visitors can only read active listings and approved seller profiles. Orders, reports and payout references are server-only.
+
+New seller applications and product listings start as `pending`. Review a seller from the SQL Editor after verifying their business and payment onboarding:
+
+```sql
+update public.marketplace_sellers
+set status = 'approved', updated_at = now()
+where user_id = '<seller-auth-user-uuid>';
+```
+
+Review listing accuracy and legal eligibility before publishing it:
+
+```sql
+update public.marketplace_listings
+set status = 'active', updated_at = now()
+where id = '<listing-uuid>' and status = 'pending';
+```
+
+Buyer checkout is separately disabled for each seller by default. Only after verifying the seller's Flutterwave/identity onboarding and signing a written settlement agreement, enable that seller's NGN checkout:
+
+```sql
+update public.marketplace_sellers
+set checkout_enabled = true, updated_at = now()
+where user_id = '<seller-auth-user-uuid>'
+  and status = 'approved';
+```
+
+Set it back to `false` to pause checkout. Buyer funds go to the Graphite19Stores Flutterwave merchant account. Seller payouts are manual under separate written terms; there is no automatic split-payment or payout integration.
+
+Only trusted project administrators should run these moderation statements. The client cannot set seller or listing approval status. Reports can be submitted by signed-in users; their records are available only to trusted server-side/admin access.
+
+Seller settlement information is intentionally not exposed to the browser. Flutterwave secret keys, webhook hash, orders and payment state remain server-side. Checkout stays disabled unless both `MARKETPLACE_PAYMENTS_ENABLED=true` and the seller's `checkout_enabled` database flag are set.
+
 ## Site analytics
 
 Enable **Analytics** for the project in the Vercel dashboard to see Vercel's visitor and page-view reports. The app also records route views in `public.site_page_views` after you apply `migrations/20261012150542_create_site_visit_analytics.sql` to Supabase. It stores the page path, timestamp, and a random per-tab session ID; it does not store names, emails, or IP addresses. The public app can insert records but cannot read or edit them through the Data API.

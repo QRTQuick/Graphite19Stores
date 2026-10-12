@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { StoreContext } from './storeContext.js'
+import { getLowestPriceVariant } from '../lib/pricing.js'
 
 export function StoreProvider({ children }) {
   const [products, setProducts] = useState([])
@@ -61,7 +62,7 @@ export function StoreProvider({ children }) {
 
   const addToCart = (product, variant = null) => {
     const key = `${product.id}:${variant?.id || 'default'}`
-    const chosen = variant || product.variants?.[0]
+    const chosen = variant || getLowestPriceVariant(product) || product.variants?.[0]
     setCart((items) => {
       const match = items.find((item) => item.key === key)
       const line = { key, id: product.id, title: product.title, image: chosen?.image || product.image, color: chosen?.optionValues?.[product.colorOptionName]?.title || product.color, variantTitle: chosen?.title || '', variantId: chosen?.id || null, price: Number(chosen?.price ?? product.price), quantity: 1 }

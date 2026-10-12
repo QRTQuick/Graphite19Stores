@@ -1,6 +1,6 @@
 const siteUrl = 'https://graphite19-stores.vercel.app'
 
-const publicPaths = ['/', '/shop', '/about', '/contact', '/faq', '/privacy', '/terms']
+const publicPaths = ['/', '/shop', '/marketplace', '/sell', '/about', '/contact', '/faq', '/privacy', '/terms', '/seller-terms']
 
 function xmlEscape(value) {
   return String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&apos;')
