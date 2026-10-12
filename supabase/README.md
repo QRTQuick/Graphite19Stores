@@ -2,9 +2,13 @@
 
 Supabase Auth stores registrations in its managed `auth.users` table. This project supports email/password registration, email/password sign-in, password reset, and Google OAuth.
 
-## Create the profile table
+## Profile details
 
-Apply `migrations/20261012091621_create_profiles.sql` to the Supabase project before using the account profile page. In the Supabase Dashboard, open **SQL Editor**, paste the migration contents, and run it. The table has row-level security; signed-in users can only read, create, and update the profile row whose ID matches their own Auth user ID.
+The account page stores the customer's display name and phone number in their Supabase Auth user metadata. This keeps profile editing available without a separate table migration. These values are for display/contact purposes only and are not used for authorization.
+
+## Optional profile table
+
+Apply `migrations/20261012091621_create_profiles.sql` only if you choose to move profile details into a separate relational table. In the Supabase Dashboard, open **SQL Editor**, paste the migration contents, and run it. The table has row-level security; signed-in users can only read, create, and update the profile row whose ID matches their own Auth user ID.
 
 This repository is not linked to a Supabase project yet, and the browser publishable key cannot apply database migrations. The SQL file is ready, but it has not been applied to the hosted project.
 

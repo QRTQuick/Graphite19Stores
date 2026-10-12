@@ -15,7 +15,14 @@ export function ProductImage({ product, width = 760, ...props }) {
   const src = product?.image?.startsWith('http')
     ? product.image
     : `https://images.unsplash.com/${product?.image || 'photo-1521572163474-6864f9cf17ab'}?auto=format&fit=crop&w=${width}&q=85`
-  return <img src={src} alt={product?.title || ''} {...props}/>
+  const [loadedSrc, setLoadedSrc] = useState('')
+  const [failedSrc, setFailedSrc] = useState('')
+  const isLoading = loadedSrc !== src && failedSrc !== src
+  return <span className={`product-image-frame${isLoading ? ' is-loading' : ''}${failedSrc === src ? ' has-error' : ''}`}>
+    <img src={src} alt={product?.title || ''} onLoad={() => setLoadedSrc(src)} onError={() => setFailedSrc(src)} {...props}/>
+    {isLoading && <span className="image-loading-indicator" role="status" aria-live="polite"><span className="sr-only">Loading {product?.title || 'product'} image</span><span className="image-loading-mark" aria-hidden="true"><i/><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 4-4 3 3 2-2 5 4"/></svg></span></span>}
+    {failedSrc === src && <span className="image-loading-indicator image-load-failed" aria-hidden="true"><span className="image-loading-mark"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><circle cx="9" cy="10" r="1.5"/><path d="m5 17 4-4 3 3 2-2 5 4"/></svg></span></span>}
+  </span>
 }
 
 function CartDrawer({ onClose }) {

@@ -17,11 +17,11 @@ const LegalPage = lazy(() => import('./pages/ContentPages.jsx').then((module) =>
 const FAQPage = lazy(() => import('./pages/ContentPages.jsx').then((module) => ({ default: module.FAQPage })))
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage.jsx'))
 
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children, checkout = false }) {
   const { user, authLoading } = useStore()
   const location = useLocation()
   if (authLoading) return <LoadingScreen label="Loading your account"/>
-  return user ? children : <Navigate to="/login" replace state={{ from: location.pathname }}/>
+  return user ? children : <Navigate to="/login" replace state={{ from: location.pathname, checkoutRequired: checkout }}/>
 }
 
 function NotFound() {
@@ -130,7 +130,7 @@ function SiteRoutes() {
     <Route path="signup" element={<AuthPage mode="signup"/>}/>
     <Route path="reset-password" element={<AuthPage mode="reset"/>}/>
     <Route path="account" element={<ProtectedRoute><AccountPage/></ProtectedRoute>}/>
-    <Route path="checkout" element={<CheckoutPage/>}/>
+    <Route path="checkout" element={<ProtectedRoute checkout><CheckoutPage/></ProtectedRoute>}/>
     <Route path="privacy" element={<LegalPage type="privacy"/>}/>
     <Route path="terms" element={<LegalPage type="terms"/>}/>
     <Route path="*" element={<NotFound/>}/>
