@@ -7,7 +7,7 @@ The site also includes an early multi-vendor marketplace for independent seller 
 ## Local setup
 
 1. Copy `.env.example` to `.env` (already ignored by Git).
-2. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` from your Supabase project. In Supabase Authentication, enable Google and add your local and production account URLs to the redirect URL allow list.
+2. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` from your Supabase project. In Supabase Authentication, enable Google and add the local and production `/account` and `/reset-password` URLs to the redirect URL allow list.
 3. Set `PRINTIFY_API_KEY` and `PRINTIFY_SHOP_ID` in the server environment. Keep these server-only values out of any `VITE_` variable and out of source control.
 4. For delivery address suggestions, enable Google Maps Platform's Places API (New) and set the server-only `GOOGLE_MAPS_API_KEY`.
 5. Apply the marketplace migration described in [supabase/README.md](supabase/README.md) before using seller or marketplace pages.

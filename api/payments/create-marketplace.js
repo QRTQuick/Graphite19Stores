@@ -13,6 +13,11 @@ export default async function handler(request, response, environment) {
   if (env.MARKETPLACE_PAYMENTS_ENABLED !== 'true') return response.status(503).json({ error: 'Marketplace checkout is not enabled yet.' })
   const user = await getPaymentUser(request, env)
   if (!user) return response.status(401).json({ error: 'Please sign in before checkout.' })
+  const profilePhone = String(user.user_metadata?.phone || '').trim()
+  const profileCountry = String(user.user_metadata?.country_code || '').trim()
+  if (profilePhone.replace(/\D/g, '').length < 7 || !/^[A-Z]{2}$/.test(profileCountry)) {
+    return response.status(403).json({ error: 'Add a valid phone number and country to your account profile before checkout.' })
+  }
   const admin = createMarketplaceAdmin(env)
   const paymentSecret = getPaymentSecret(env)
   if (!admin || !paymentSecret) return response.status(503).json({ error: 'Marketplace payments are not configured yet.' })

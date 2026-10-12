@@ -107,6 +107,7 @@ button:disabled{cursor:not-allowed}
 .address-verified{display:flex;gap:11px;align-items:flex-start;margin-top:15px;padding:13px;border:1px solid #d5e4d7;border-radius:11px;background:#f5faf5;color:#46634b}
 .address-verified>span{display:grid;width:21px;height:21px;flex:none;place-items:center;border-radius:50%;background:#e2f0e3;font-size:11px}
 .address-verified p{margin:0;font-size:9px;line-height:1.7;overflow-wrap:anywhere}
+.profile-required-note{margin:0 0 18px;padding:14px 16px;border:1px solid #e8d5d7;border-radius:10px;background:#fff7f7;color:#712530;font-size:12px;line-height:1.7}.profile-form .required-label{margin-left:5px;color:#841c2a;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.profile-form label:has(.required-label){font-size:11px}
 .checkout-message-success{border-color:#d5e4d7;background:#f5faf5;color:#46634b}
 .checkout-pay:disabled{opacity:.65;cursor:wait;transform:none}
 @media(max-width:620px){.address-suggestions{max-height:220px}.address-suggestions>button{min-height:46px;font-size:10px}.google-attribution{min-height:35px}}

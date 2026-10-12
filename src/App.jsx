@@ -29,7 +29,12 @@ function ProtectedRoute({ children, checkout = false }) {
   const { user, authLoading } = useStore()
   const location = useLocation()
   if (authLoading) return <LoadingScreen label="Loading your account"/>
-  return user ? children : <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}`, checkoutRequired: checkout }}/>
+  const returnTo = `${location.pathname}${location.search}`
+  if (!user) return <Navigate to="/login" replace state={{ from: returnTo, checkoutRequired: checkout }}/>
+  const phone = String(user.user_metadata?.phone || '').trim()
+  const countryCode = String(user.user_metadata?.country_code || '').trim()
+  if (checkout && (phone.replace(/\D/g, '').length < 7 || !/^[A-Z]{2}$/.test(countryCode))) return <Navigate to="/account" replace state={{ from: returnTo, requireProfile: true }}/>
+  return children
 }
 
 function NotFound() {
@@ -55,9 +60,9 @@ function PageMetadata() {
   useEffect(() => {
     const product = pathname.startsWith('/products/') ? products.find((item) => String(item.id) === pathname.split('/')[2]) : null
     const titles = {
-      '/': 'Custom Clothes & Face Caps | Graphite19Stores',
+      '/': 'Market Hall | Graphite19Stores',
       '/shop': 'Shop Custom Clothes & Face Caps | Graphite19Stores',
-      '/marketplace': 'Shop Independent Sellers | Graphite19Stores Marketplace',
+      '/marketplace': 'Market Hall | Clothes, Cars, PCs & Watches | Graphite19Stores',
       '/sell': 'Sell on Graphite19Stores | Open a Seller Store',
       '/seller-terms': 'Seller Terms | Graphite19Stores Marketplace',
       '/about': 'About Graphite19Stores | Custom Clothing Designed in Lagos',
@@ -73,7 +78,7 @@ function PageMetadata() {
       '/terms': 'Terms — Graphite19Stores',
     }
     const descriptions = {
-      '/': 'Shop custom clothes, everyday streetwear and face caps at comfortable prices. Discover fresh designs from Graphite19Stores, designed in Lagos.',
+      '/': 'Visit the Graphite19Stores Market Hall to discover clothes, cars, computers, watches and other finds from independent sellers.',
       '/shop': 'Explore custom clothing, graphic apparel and face caps from Graphite19Stores. Find everyday styles at comfortable prices.',
       '/marketplace': 'Discover clothes, cars, computers, watches and other finds from independent Graphite19Stores marketplace sellers.',
       '/sell': 'Apply to sell clothes, cars, computers, watches and other products on the Graphite19Stores marketplace.',
@@ -85,7 +90,7 @@ function PageMetadata() {
     }
     const productDescription = product?.description?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 155)
     const title = product ? `${product.title} | Graphite19Stores` : titles[pathname] || 'Page not found | Graphite19Stores'
-    const description = productDescription || descriptions[pathname] || 'Shop custom clothes and face caps at comfortable prices from Graphite19Stores.'
+    const description = productDescription || descriptions[pathname] || 'Discover clothes, cars, computers, watches and other finds at the Graphite19Stores Market Hall.'
     const canonicalUrl = `https://graphite19-stores.vercel.app${pathname}`
     const privatePath = ['/login', '/signup', '/reset-password', '/account', '/checkout', '/orders', '/payment/return'].includes(pathname) || pathname.startsWith('/marketplace/checkout/')
     const robots = (!product && !titles[pathname]) || privatePath ? 'noindex, nofollow' : 'index, follow, max-image-preview:large'

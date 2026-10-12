@@ -64,6 +64,6 @@ from public.site_page_views;
 
 ## Enable Google sign-in
 
-In **Authentication → Sign-in providers**, enable Google and enter the Google OAuth web client ID and client secret. Add `http://localhost:5173/account` and your production account URL to Supabase's redirect URL allow list. In Google Cloud, add your site origin as an authorized JavaScript origin and the Supabase Auth callback shown in the Google provider settings as an authorized redirect URI.
+In **Authentication → Sign-in providers**, enable Google and enter the Google OAuth web client ID and client secret. Add your local and production `/account` and `/reset-password` URLs to Supabase's redirect URL allow list. Password recovery sends the user to `/reset-password`, where the site checks the recovery session before accepting a new password. In Google Cloud, add your site origin as an authorized JavaScript origin and the Supabase Auth callback shown in the Google provider settings as an authorized redirect URI.
 
 Email/password registration uses Supabase Auth. If email confirmation is enabled in the project, new users must confirm their email before they can sign in. Set the Auth Site URL and redirect allow list to the site URLs you use.
