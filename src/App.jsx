@@ -1,5 +1,6 @@
 import { Component, lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import './pages.css'
 import StoreLayout from './components/StoreLayout.jsx'
 import { StoreProvider } from './context/StoreContext.jsx'
@@ -138,5 +139,5 @@ function SiteRoutes() {
 }
 
 export default function App() {
-  return <BrowserRouter><StoreProvider><SiteRoutes/></StoreProvider></BrowserRouter>
+  return <BrowserRouter><StoreProvider><SiteRoutes/><Analytics /></StoreProvider></BrowserRouter>
 }
