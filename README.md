@@ -10,7 +10,7 @@ The site also includes an early multi-vendor marketplace for independent seller 
 2. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` from your Supabase project. In Supabase Authentication, enable Google and add the local and production `/account` and `/reset-password` URLs to the redirect URL allow list.
 3. Set `PRINTIFY_API_KEY` and `PRINTIFY_SHOP_ID` in the server environment. Keep these server-only values out of any `VITE_` variable and out of source control.
 4. For delivery address suggestions, enable Google Maps Platform's Places API (New) and set the server-only `GOOGLE_MAPS_API_KEY`.
-5. Apply the marketplace migration described in [supabase/README.md](supabase/README.md) before using seller or marketplace pages.
+5. Apply both marketplace migrations described in [supabase/README.md](supabase/README.md) before using seller or marketplace pages.
 6. Run `npm run dev`.
 
 ## Production hosting
@@ -19,7 +19,7 @@ Build with `npm run build` and publish the generated `dist/` directory from the 
 
 Configure `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` as build-time environment variables on the hosting provider. Configure `PRINTIFY_API_KEY` and `PRINTIFY_SHOP_ID` as server-side environment variables. The Printify API route requires a host that supports the included Vercel function (`api/products.js`).
 
-Configure `GOOGLE_MAPS_API_KEY`, `FLW_SECRET_KEY`, `FLW_SECRET_HASH`, `SUPABASE_SECRET_KEY` and `APP_BASE_URL` as server-only environment variables in local `.env` and Vercel. Never prefix secrets with `VITE_`. Set `MARKETPLACE_PAYMENTS_ENABLED=true` only after Flutterwave sandbox verification and written seller settlement terms are in place; it defaults to `false`. Marketplace checkout is NGN-only, is collected into the platform Flutterwave account, and has no automatic seller split. Checkout is enabled seller by seller after approval and settlement terms are agreed. Delivery fees are agreed separately with the seller and are not collected through marketplace checkout.
+Configure `GOOGLE_MAPS_API_KEY`, `FLW_SECRET_KEY`, `FLW_SECRET_HASH`, `SUPABASE_SECRET_KEY` and `APP_BASE_URL` as server-only environment variables in local `.env` and Vercel. The admin page and marketplace moderation API require `SUPABASE_SECRET_KEY`; keep it server-side and never prefix it with `VITE_`. Only the authenticated `graphite19stores@gmail.com` account can use `/admin`. Set `MARKETPLACE_PAYMENTS_ENABLED=true` only after Flutterwave sandbox verification and written seller settlement terms are in place; it defaults to `false`. Marketplace checkout is NGN-only, is collected into the platform Flutterwave account, and has no automatic seller split. Checkout is enabled seller by seller after approval and settlement terms are agreed. Delivery fees are agreed separately with the seller and are not collected through marketplace checkout.
 
 The live sitemap is served at `/sitemap.xml`; it lists public pages and visible products from the connected Printify catalog. `public/robots.txt` references the sitemap. After deploying, submit `https://graphite19-stores.vercel.app/sitemap.xml` in Google Search Console to help Google discover the store URLs.
 

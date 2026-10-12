@@ -43,8 +43,8 @@ export default async function handler(request, response, environment) {
   if (listingError || !listing) return response.status(409).json({ error: 'This listing is no longer available.' })
   if (listing.seller_id === user.id) return response.status(400).json({ error: 'You cannot purchase your own listing.' })
   if (listing.currency !== 'NGN') return response.status(400).json({ error: 'This listing is not priced in NGN and cannot be checked out yet.' })
-  const { data: seller } = await admin.from('marketplace_sellers').select('status,checkout_enabled').eq('user_id', listing.seller_id).maybeSingle()
-  if (!seller || seller.status !== 'approved' || !seller.checkout_enabled) return response.status(409).json({ error: 'This seller is not cleared for platform checkout yet.' })
+  const { data: seller } = await admin.from('marketplace_sellers').select('status,checkout_enabled,review_required').eq('user_id', listing.seller_id).maybeSingle()
+  if (!seller || seller.status !== 'approved' || seller.review_required || !seller.checkout_enabled) return response.status(409).json({ error: 'This seller is not cleared for platform checkout yet.' })
   const amount = Number(listing.price)
   if (!Number.isFinite(amount) || amount <= 0 || amount > 100000000) return response.status(400).json({ error: 'This listing has an invalid price.' })
 

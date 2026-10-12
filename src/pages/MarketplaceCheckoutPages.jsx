@@ -96,6 +96,10 @@ export function PaymentResultPage() {
 export function BuyerOrdersPage() {
   const [orders, setOrders] = useState([])
   const [state, setState] = useState('loading')
+  const [ratings, setRatings] = useState({})
+  const [comments, setComments] = useState({})
+  const [message, setMessage] = useState('')
+  const [busy, setBusy] = useState('')
   useEffect(() => {
     let active = true
     const load = async () => {
@@ -111,5 +115,17 @@ export function BuyerOrdersPage() {
     void load()
     return () => { active = false }
   }, [])
-  return <main className="inner-page buyer-orders-page"><section className="page-heading"><p className="eyebrow">YOUR GRAPHITE19STORES ACCOUNT</p><h1>Order <em>history.</em></h1><p>Marketplace payments and order updates in one place.</p></section>{state === 'loading' && <p className="market-state" role="status">Loading your orders…</p>}{state === 'unavailable' && <p className="market-state">We could not load order history. Please sign in again.</p>}{state === 'ready' && orders.length === 0 && <div className="market-state"><h2>No marketplace orders yet.</h2><Link to="/marketplace">Explore the marketplace <span>→</span></Link></div>}{state === 'ready' && orders.length > 0 && <div className="buyer-orders-list">{orders.map((order) => <article key={order.id}><div className="buyer-order-heading"><div><p className="eyebrow">{order.order_reference}</p><time>{new Date(order.created_at).toLocaleDateString()}</time></div><strong>{money(order.total)}</strong></div>{order.marketplace_order_items?.map((item) => <p className="buyer-order-line" key={`${order.id}:${item.item_title}`}>{item.item_title} · {item.quantity} × {money(item.unit_price)}</p>)}<div className="buyer-order-status"><span>Payment: {order.payment_status}</span><span>Delivery: {order.fulfillment_status}</span></div></article>)}</div>}</main>
+  const submitFeedback = async (order, item) => {
+    const key = `${order.id}:${item.seller_id}`
+    setBusy(key); setMessage('')
+    try {
+      const response = await fetch('/api/marketplace/submit-feedback', { method: 'POST', headers: { 'Content-Type': 'application/json', ...await authHeaders() }, body: JSON.stringify({ orderId: order.id, sellerId: item.seller_id, rating: Number(ratings[key] || 5), comment: comments[key] || '' }) })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || 'Feedback could not be saved.')
+      setOrders((current) => current.map((entry) => entry.id !== order.id ? entry : { ...entry, marketplace_order_items: entry.marketplace_order_items.map((line) => line.seller_id === item.seller_id ? { ...line, feedback: { rating: Number(ratings[key] || 5), comment: comments[key] || '' } } : line) }))
+      setMessage(Number(ratings[key] || 5) <= 2 ? 'Thanks. This store has been flagged for a review.' : 'Thanks for sharing your feedback.')
+    } catch (error) { setMessage(error.message || 'Feedback could not be saved.') }
+    finally { setBusy('') }
+  }
+  return <main className="inner-page buyer-orders-page"><section className="page-heading"><p className="eyebrow">YOUR GRAPHITE19STORES ACCOUNT</p><h1>Order <em>history.</em></h1><p>Marketplace payments and order updates in one place.</p></section>{message && <p className="feedback-message" role="status">{message}</p>}{state === 'loading' && <p className="market-state" role="status">Loading your orders…</p>}{state === 'unavailable' && <p className="market-state">We could not load order history. Please sign in again.</p>}{state === 'ready' && orders.length === 0 && <div className="market-state"><h2>No marketplace orders yet.</h2><Link to="/marketplace">Explore the marketplace <span>→</span></Link></div>}{state === 'ready' && orders.length > 0 && <div className="buyer-orders-list">{orders.map((order) => <article key={order.id}><div className="buyer-order-heading"><div><p className="eyebrow">{order.order_reference}</p><time>{new Date(order.created_at).toLocaleDateString()}</time></div><strong>{money(order.total)}</strong></div>{order.marketplace_order_items?.map((item) => <div className="buyer-feedback-line" key={`${order.id}:${item.seller_id}:${item.item_title}`}><p className="buyer-order-line">{item.item_title} · {item.quantity} × {money(item.unit_price)}</p>{order.payment_status === 'paid' && (item.feedback ? <p className="buyer-feedback-done">Your feedback: {'★'.repeat(item.feedback.rating)}{'☆'.repeat(5 - item.feedback.rating)}</p> : <div className="buyer-feedback-form"><label>Rate the store<select value={ratings[`${order.id}:${item.seller_id}`] || '5'} onChange={(event) => setRatings((current) => ({ ...current, [`${order.id}:${item.seller_id}`]: event.target.value }))}><option value="5">5 — Excellent</option><option value="4">4 — Good</option><option value="3">3 — Okay</option><option value="2">2 — Poor</option><option value="1">1 — Very poor</option></select></label><label>Comment (optional)<input value={comments[`${order.id}:${item.seller_id}`] || ''} maxLength={2000} onChange={(event) => setComments((current) => ({ ...current, [`${order.id}:${item.seller_id}`]: event.target.value }))}/></label><button className="button button-light" disabled={busy === `${order.id}:${item.seller_id}`} onClick={() => void submitFeedback(order, item)}>{busy === `${order.id}:${item.seller_id}` ? 'Sending…' : 'Send feedback'}</button></div>)}</div>)}<div className="buyer-order-status"><span>Payment: {order.payment_status}</span><span>Delivery: {order.fulfillment_status}</span></div></article>)}</div>}</main>
 }

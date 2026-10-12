@@ -24,6 +24,7 @@ const SellerPage = lazy(() => import('./pages/MarketplacePages.jsx').then((modul
 const MarketplaceCheckoutPage = lazy(() => import('./pages/MarketplaceCheckoutPages.jsx').then((module) => ({ default: module.MarketplaceCheckoutPage })))
 const PaymentResultPage = lazy(() => import('./pages/MarketplaceCheckoutPages.jsx').then((module) => ({ default: module.PaymentResultPage })))
 const BuyerOrdersPage = lazy(() => import('./pages/MarketplaceCheckoutPages.jsx').then((module) => ({ default: module.BuyerOrdersPage })))
+const AdminPage = lazy(() => import('./pages/AdminPage.jsx'))
 
 function ProtectedRoute({ children, checkout = false }) {
   const { user, authLoading } = useStore()
@@ -73,6 +74,7 @@ function PageMetadata() {
       '/reset-password': 'Reset Your Password — Graphite19Stores',
       '/account': 'Your Account — Graphite19Stores',
       '/orders': 'Your Marketplace Orders | Graphite19Stores',
+      '/admin': 'Marketplace Admin | Graphite19Stores',
       '/checkout': 'Your Bag — Graphite19Stores',
       '/privacy': 'Privacy — Graphite19Stores',
       '/terms': 'Terms — Graphite19Stores',
@@ -92,7 +94,7 @@ function PageMetadata() {
     const title = product ? `${product.title} | Graphite19Stores` : titles[pathname] || 'Page not found | Graphite19Stores'
     const description = productDescription || descriptions[pathname] || 'Discover clothes, cars, computers, watches and other finds at the Graphite19Stores Market Hall.'
     const canonicalUrl = `https://graphite19-stores.vercel.app${pathname}`
-    const privatePath = ['/login', '/signup', '/reset-password', '/account', '/checkout', '/orders', '/payment/return'].includes(pathname) || pathname.startsWith('/marketplace/checkout/')
+    const privatePath = ['/login', '/signup', '/reset-password', '/account', '/checkout', '/orders', '/admin', '/payment/return'].includes(pathname) || pathname.startsWith('/marketplace/checkout/')
     const robots = (!product && !titles[pathname]) || privatePath ? 'noindex, nofollow' : 'index, follow, max-image-preview:large'
     document.title = title
     document.querySelector('meta[name="description"]')?.setAttribute('content', description)
@@ -182,6 +184,7 @@ function SiteRoutes() {
     <Route path="marketplace/checkout/:id" element={<ProtectedRoute checkout><MarketplaceCheckoutPage/></ProtectedRoute>}/>
     <Route path="payment/return" element={<ProtectedRoute><PaymentResultPage/></ProtectedRoute>}/>
     <Route path="orders" element={<ProtectedRoute><BuyerOrdersPage/></ProtectedRoute>}/>
+    <Route path="admin" element={<ProtectedRoute><AdminPage/></ProtectedRoute>}/>
     <Route path="sell" element={<SellerPage/>}/>
     <Route path="seller-terms" element={<LegalPage type="seller"/>}/>
     <Route path="products/:id" element={<ProductPage/>}/>

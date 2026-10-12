@@ -14,9 +14,11 @@ This repository is not linked to a Supabase project yet, and the browser publish
 
 ## Marketplace database
 
-Before using the marketplace, apply `migrations/20261012170000_create_marketplace.sql` in the Supabase Dashboard SQL Editor. This repository does not have the Supabase CLI or a linked project configured in this workspace, so the migration has not been applied to the hosted database. The migration creates seller stores, listings, private buyer/seller messages, listing reports, and server-only order and payout tables. It enables RLS and explicit grants; public visitors can only read active listings and approved seller profiles. Orders, reports and payout references are server-only.
+The base marketplace migration `migrations/20261012170000_create_marketplace.sql` has been run in the hosted project. Also run the new `migrations/20261012180000_marketplace_admin_moderation.sql` in the Supabase Dashboard SQL Editor. It adds the admin review queue, buyer feedback, private review fields and a server-only listing submission function. The app uses the `SUPABASE_SECRET_KEY` server-side environment variable for admin review; never add it to a `VITE_` variable.
 
-New seller applications and product listings start as `pending`. Review a seller from the SQL Editor after verifying their business and payment onboarding:
+Seller applications are saved in `public.marketplace_sellers` with `status = 'pending'`; the requesting store appears in `/admin` after the new migration and server secret are configured. That admin route and its API authorize only `graphite19stores@gmail.com`. Sellers' first three eligible products publish automatically; products four and five wait for review. A seller can have at most five active, pending or reserved listings at once. Price checks flag prices above twice the category and currency median when there are at least five comparable active listings; 10 paid sales in 30 days also flags a new listing. Low buyer ratings (1 or 2) place the store and its public listings under review. The admin page shows a 3-hour response target and a 48-hour maximum.
+
+Review and approve applications and listings in the admin page. Manual SQL remains available if needed:
 
 ```sql
 update public.marketplace_sellers

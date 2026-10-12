@@ -12,6 +12,10 @@ import marketplacePaymentStatus from './api/payments/marketplace-status.js'
 import myMarketplaceOrders from './api/payments/my-orders.js'
 import sellerMarketplaceOrders from './api/payments/seller-orders.js'
 import updateMarketplaceFulfillment from './api/payments/update-fulfillment.js'
+import marketplaceAdmin from './api/admin/marketplace.js'
+import marketplaceAdminAction from './api/admin/marketplace-action.js'
+import createMarketplaceListing from './api/marketplace/create-listing.js'
+import submitMarketplaceFeedback from './api/marketplace/submit-feedback.js'
 
 function printifyDevApi(env) {
   return {
@@ -64,9 +68,15 @@ function printifyDevApi(env) {
         ['/payments/seller-orders', sellerMarketplaceOrders],
         ['/payments/update-fulfillment', updateMarketplaceFulfillment],
       ])
+      const marketplaceHandlers = new Map([
+        ['/admin/marketplace', marketplaceAdmin],
+        ['/admin/marketplace-action', marketplaceAdminAction],
+        ['/marketplace/create-listing', createMarketplaceListing],
+        ['/marketplace/submit-feedback', submitMarketplaceFeedback],
+      ])
       server.middlewares.use('/api', async (request, response, next) => {
         const pathname = request.url?.split('?')[0] || ''
-        const handler = addressHandlers.get(pathname) || paymentHandlers.get(pathname)
+        const handler = addressHandlers.get(pathname) || paymentHandlers.get(pathname) || marketplaceHandlers.get(pathname)
         if (!handler) return next()
 
         const chunks = []
