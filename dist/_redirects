@@ -1,0 +1,3 @@
+# Vite serves hashed stylesheets and scripts from /assets; let files pass through.
+# Route all other paths to React Router so refreshes on /shop, /login, etc. work.
+/*    /index.html   200
