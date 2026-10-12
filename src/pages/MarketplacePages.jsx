@@ -22,9 +22,7 @@ const money = (amount, currency = 'NGN') => new Intl.NumberFormat('en-NG', { sty
 
 function sellerApplicationError(error) {
   if (error?.code === '23505') return 'A seller application already exists for this account.'
-  if (['PGRST205', '42P01'].includes(error?.code)) return 'Seller applications are not enabled in this database yet. In Supabase Dashboard → SQL Editor, run supabase/migrations/20261012170000_create_marketplace.sql, then refresh this page.'
-  if (['42501', 'PGRST204'].includes(error?.code) || error?.status === 401 || error?.status === 403) return 'Supabase denied this application. Sign in again. If the problem continues, run the marketplace migration in Supabase SQL Editor to install the seller permissions.'
-  return `We could not submit your application. Please try again${error?.code ? ` (database error ${error.code})` : ''}.`
+  return 'We could not submit your application right now. Please try again later or contact graphite19stores@gmail.com for help.'
 }
 
 function ListingCard({ listing }) {
