@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect } from 'react'
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { Component, lazy, Suspense, useEffect } from 'react'
+import { BrowserRouter, Link, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import './pages.css'
 import StoreLayout from './components/StoreLayout.jsx'
 import { StoreProvider } from './context/StoreContext.jsx'
@@ -25,7 +25,20 @@ function ProtectedRoute({ children }) {
 }
 
 function NotFound() {
-  return <main className="inner-page empty-page"><p className="eyebrow">404 / NOT FOUND</p><h1>This page took<br/><em>a different turn.</em></h1><a className="button button-dark" href="/">Back to home <span>→</span></a></main>
+  return <main className="inner-page empty-page error-page"><div className="error-mark" aria-hidden="true">404</div><p className="eyebrow">NOT FOUND</p><h1>This page took<br/><em>a different turn.</em></h1><p>Let’s get you back to something good.</p><Link className="button button-dark" to="/">Back to home <span>→</span></Link></main>
+}
+
+class PageErrorBoundary extends Component {
+  state = { hasError: false }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  render() {
+    if (!this.state.hasError) return this.props.children
+    return <main className="inner-page empty-page error-page" role="alert"><div className="error-mark" aria-hidden="true">G19</div><p className="eyebrow">A QUICK PAUSE</p><h1>Something didn’t<br/>load <em>quite right.</em></h1><p>Your bag and account are safe. Please try again.</p><div className="error-actions"><button className="button button-dark" onClick={() => window.location.reload()}>Try again <span>↻</span></button><Link className="button button-light" to="/">Back to home <span>→</span></Link></div></main>
+  }
 }
 
 function PageMetadata() {
@@ -105,7 +118,8 @@ function PageMetadata() {
 }
 
 function SiteRoutes() {
-  return <><PageMetadata/><Suspense fallback={<LoadingScreen/>}><Routes><Route element={<StoreLayout/>}>
+  const location = useLocation()
+  return <><PageMetadata/><PageErrorBoundary key={location.pathname}><Suspense fallback={<LoadingScreen/>}><div className="page-transition" key={location.pathname}><Routes><Route element={<StoreLayout/>}>
     <Route index element={<HomePage/>}/>
     <Route path="shop" element={<ShopPage/>}/>
     <Route path="products/:id" element={<ProductPage/>}/>
@@ -120,7 +134,7 @@ function SiteRoutes() {
     <Route path="privacy" element={<LegalPage type="privacy"/>}/>
     <Route path="terms" element={<LegalPage type="terms"/>}/>
     <Route path="*" element={<NotFound/>}/>
-  </Route></Routes></Suspense></>
+  </Route></Routes></div></Suspense></PageErrorBoundary></>
 }
 
 export default function App() {
